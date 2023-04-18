@@ -148,6 +148,21 @@
                                             </div>
                                             <hr />
                                         </div>
+                                        
+                                        <div>
+                                            <div>
+                                                <p class="report-section-label mr-2">Cookies2</p>
+                                                <small slot="helperText" class="form-text text-muted report-section-description">
+                                                    Non-HTTPOnly cookies of the victim.
+                                                </small>
+                                            </div>
+                                            <div class="m-2 mt-4">
+                                                <pre v-if="report.dom">{{report.cookdomies}}</pre>
+                                                <pre v-else><i>None</i></pre>
+                                            </div>
+                                            <hr />
+                                        </div>
+
                                         <div>
                                             <div>
                                                 <p class="report-section-label mr-2">Local Storage</p>
