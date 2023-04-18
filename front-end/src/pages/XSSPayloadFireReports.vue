@@ -135,64 +135,48 @@
                                             </div>
                                             <hr />
                                         </div>
-                             <div>
                                         <div>
-                                            <p class="report-section-label mr-2">Cookies</p>
-                                            <small slot="helperText" class="form-text text-muted report-section-description">
-                                                Non-HTTPOnly cookies of the victim.
-                                            </small>
+                                            <div>
+                                                <p class="report-section-label mr-2">Cookies</p>
+                                                <small slot="helperText" class="form-text text-muted report-section-description">
+                                                    Non-HTTPOnly cookies of the victim.
+                                                </small>
+                                            </div>
+                                            <div class="m-2 mt-4">
+                                                <pre v-if="report.cookies">{{report.cookies}}</pre>
+                                                <pre v-else><i>None</i></pre>
+                                            </div>
+                                            <hr />
                                         </div>
-                                        <div class="m-2 mt-4">
-                                            <code v-if="report.cookies">{{report.cookies}}</code>
-                                            <pre v-else><i>None</i></pre>
-                                        </div>
-                                        <hr />
-                                    </div>
-                                    <div>
                                         <div>
-                                            <p class="report-section-label mr-2">Title</p>
-                                            <small slot="helperText" class="form-text text-muted report-section-description">
-                                                Vulnerable page's title.
-                                            </small>
+                                            <div>
+                                                <p class="report-section-label mr-2">Local Storage</p>
+                                                <small slot="helperText" class="form-text text-muted report-section-description">
+                                                    the Local Storage content of the page the payload fired on.
+                                                </small>
+                                            </div>
+                                            <div class="m-2 mt-4" v-if="report.localstorage">
+                                                <pre v-for="(key, value) in report.localstorage">Key: {{ value }}
+    Value: {{ key }}</pre>
+                                            </div>
+                                            <div>
+                                                <pre v-else>No Local Storage content detected</pre>
+                                            </div>
+                                            <hr />
                                         </div>
-                                        <div class="m-2 mt-4">
-                                            <code v-if="report.title">{{report.title}}</code>
-                                            <pre v-else><i>None</i></pre>
-                                        </div>
-                                        <hr />
-                                    </div>
-                                    <div>
                                         <div>
-                                            <p class="report-section-label mr-2">DOM/HTML</p>
-                                            <small slot="helperText" class="form-text text-muted report-section-description">
-                                                Rendered DOM of the vulnerable page.
-                                            </small>
+                                            <div>
+                                                <p class="report-section-label mr-2">Title</p>
+                                                <small slot="helperText" class="form-text text-muted report-section-description">
+                                                    Vulnerable page's title.
+                                                </small>
+                                            </div>
+                                            <div class="m-2 mt-4">
+                                                <pre v-if="report.title">{{report.title}}</pre>
+                                                <pre v-else><i>None</i></pre>
+                                            </div>
+                                            <hr />
                                         </div>
-                                        <div class="m-2 mt-4">
-                                            <codemirror style="height: auto;" ref="cmEditor" v-model="report.dom" :options="{tabSize: 2, theme: 'monokai', lineNumbers: true, line: true, lint: true, lineWrapping: true, fixedGutter: true, readOnly: true}" v-if="report.dom.length < 10000" />
-                                            <h4 v-else><i class="fas fa-exclamation-triangle"></i> Page HTML too large to display inline, please use one of the options below.</h4>
-                                            <base-button simple type="primary" class="mt-3 ml-1 mr-1" v-on:click="view_html_in_new_tab(report.dom)">
-                                                <i class="fas fa-external-link-alt"></i> View Raw HTML in New Tab
-                                            </base-button>
-                                            <base-button simple type="primary" class="mt-3 ml-1 mr-1" v-on:click="download_html(report.dom)">
-                                                <i class="fas fa-download"></i> Download Raw HTML
-                                            </base-button>
-                                        </div>
-                                        <hr />
-                                    </div>
-                                    <div>
-                                        <div>
-                                            <p class="report-section-label mr-2">Text</p>
-                                            <small slot="helperText" class="form-text text-muted report-section-description">
-                                                Text of the vulnerable page.
-                                            </small>
-                                        </div>
-                                        <div class="m-2 mt-4">
-                                            <codemirror style="height: auto;" ref="cmEditortext" v-model="report.text" :options="{tabSize: 2, theme: 'monokai', lineNumbers: true, line: true, lint: false, lineWrapping: true, fixedGutter: true, readOnly: true}" v-if="report.text" />
-                                            <pre v-else><i>None</i></pre>
-                                        </div>
-                                        <hr />
-                                    </div>
                                         <div>
                                             <div>
                                                 <p class="report-section-label mr-2">Origin</p>
