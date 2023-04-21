@@ -23,6 +23,7 @@ This is a payload to test for Cross-site Scripting (XSS). It is meant to be used
 This is a self-hosted instance of XSS Hunter Express. It is not the same as the XSS Hunter website.
 */
 
+/*
 console.log(`%c
 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 .                                                                                 .
@@ -63,6 +64,7 @@ console.log(`%c
 .                                                                                 .
 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 `,"color:#9acc14; background:black; font-family: monospace");
+*/
 
 // GPG encryption https://openpgpjs.org/
 /*! OpenPGP.js v5.5.0 - 2022-08-31 - this is LGPL licensed code, see LICENSE/our website https://openpgpjs.org/ for more information. */
