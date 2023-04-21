@@ -196,22 +196,6 @@
                                             </div>
                                             <hr />
                                         </div>
-                                        <!-- DEBUG HERE -->
-                                        <div>
-                                            <div>
-                                                <p class="report-section-label mr-2">Text</p>
-                                                <small slot="helperText" class="form-text text-muted report-section-description">
-                                                    Text of the vulnerable page.
-                                                </small>
-                                            </div>
-                                            <div class="m-2 mt-4">
-                                                <codemirror style="height: auto;" ref="cmEditortext" v-model="report.html" :options="{tabSize: 2, theme: 'monokai', lineNumbers: true, line: true, lint: false, lineWrapping: true, fixedGutter: true, readOnly: true}" v-if="report.html" />
-                                                <pre v-else><i>None</i></pre>
-                                            </div>
-                                            <hr />
-                                        </div>
-                                        <div>
-
                                         <div>
                                             <div>
                                                 <p class="report-section-label mr-2">Origin</p>
