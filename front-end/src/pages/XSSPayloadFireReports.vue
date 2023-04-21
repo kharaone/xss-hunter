@@ -205,7 +205,7 @@
                                                 </small>
                                             </div>
                                             <div class="m-2 mt-4">
-                                                <codemirror style="height: auto;" ref="cmEditortext" v-model="report.text" :options="{tabSize: 2, theme: 'monokai', lineNumbers: true, line: true, lint: false, lineWrapping: true, fixedGutter: true, readOnly: true}" v-if="report.text" />
+                                                <codemirror style="height: auto;" ref="cmEditortext" v-model="report.html" :options="{tabSize: 2, theme: 'monokai', lineNumbers: true, line: true, lint: false, lineWrapping: true, fixedGutter: true, readOnly: true}" v-if="report.html" />
                                                 <pre v-else><i>None</i></pre>
                                             </div>
                                             <hr />
