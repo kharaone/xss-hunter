@@ -21,6 +21,11 @@ const routes = [
         component: XSSPayloads
       },
       {
+        path: "/collectedpages",
+        name: "Collected Pages",
+        component: CollectedPages
+      },
+      {
         path: "/settings",
         name: "Settings",
         component: Settings
