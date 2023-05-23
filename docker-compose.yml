@@ -1,4 +1,11 @@
 services:
+  # Postgres server to store injection data (not including
+  # screenshots which are stored separately).
+  # NOTE: If you're using an external SQL server, you can comment
+  # out this service.
+  # WARNING: This database gives the "postgres" user admin priveleges
+  # with a default password of "xsshunterexpress". Do not expose it
+  # externally. If you do, be sure to change the password.
   xsshunterexpress-db:
     image: postgres
     container_name: xsshunterexpress-db
@@ -6,6 +13,10 @@ services:
     env_file:
       - .env
     environment:
+      # This is a volume mounted into the container
+      # (see the directory ./postgres-db-data)
+      # So the database will be persisted across
+      # container deletion.
       PGDATA: /var/lib/postgresql/data/pgdata
       POSTGRES_HOST_AUTH_METHOD: trust
     healthcheck:
@@ -14,7 +25,8 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - ./postgres-db-data:/var/lib/postgresql/data/pgdata
+      - db-data:/var/lib/postgresql/data/pgdata
+
   xsshunterexpress-service:
     build: .
     container_name: xsshunterexpress-service
@@ -24,11 +36,20 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - ./payload-fire-images:/app/payload-fire-images
+      # Stores the SSL/TLS certificates and keys
+      # in the "ssldata" directory.
+      # Your certificates are automatically renewed
+      # via LetsEncrypt, no extra work needed!
+      # - ./ssldata:/app/greenlock.d
+      # Directory where payload fire images are stored.
+      - payloads-data:/app/payload-fire-images
       - ~/.config/gcloud/application_default_credentials.json:/gcloud.json
+    # Comment out if you're using an external SQL
+    # server and have commented out the DB section.
     depends_on:
       xsshunterexpress-db:
         condition: service_healthy
+
   xsshunterexpress-trufflehog:
     build:
       dockerfile: Dockerfile.trufflehog
@@ -36,6 +57,7 @@ services:
     restart: unless-stopped
     ports:
       - 8000:8000
+
   xsshunterexpress-proxy:
     image: caddy:alpine
     container_name: xsshunterexpress-proxy
@@ -49,3 +71,7 @@ services:
       - ./caddy/data:/data
       - ./caddy/config:/config
       - ./Caddyfile:/etc/caddy/Caddyfile
+
+volumes:
+  payloads-data:
+  db-data:
