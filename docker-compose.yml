@@ -34,7 +34,7 @@ services:
     env_file:
       - .env
     ports:
-      - 8080:8080
+      - 80:80
     volumes:
       # Stores the SSL/TLS certificates and keys
       # in the "ssldata" directory.
@@ -58,19 +58,19 @@ services:
     ports:
       - 8000:8000
 
-  xsshunterexpress-proxy:
-    image: caddy:alpine
-    container_name: xsshunterexpress-proxy
-    restart: unless-stopped
-    env_file:
-      - .env
-    ports:
-      - 80:80
-      - 443:443
-    volumes:
-      - ./caddy/data:/data
-      - ./caddy/config:/config
-      - ./Caddyfile:/etc/caddy/Caddyfile
+  # xsshunterexpress-proxy:
+  #   image: caddy:alpine
+  #   container_name: xsshunterexpress-proxy
+  #   restart: unless-stopped
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - 80:80
+  #     - 443:443
+  #   volumes:
+  #     - ./caddy/data:/data
+  #     - ./caddy/config:/config
+  #     - ./Caddyfile:/etc/caddy/Caddyfile
 
 volumes:
   payloads-data:
