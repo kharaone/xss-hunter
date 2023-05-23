@@ -33,8 +33,6 @@ services:
     restart: unless-stopped
     env_file:
       - .env
-    ports:
-    - 8080
     volumes:
       # Stores the SSL/TLS certificates and keys
       # in the "ssldata" directory.
