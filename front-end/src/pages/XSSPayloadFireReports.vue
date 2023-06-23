@@ -182,7 +182,7 @@
                                                     Rendered DOM of the vulnerable page.
                                                 </small>
                                             </div>
-                                            <div class="m-2 mt-4">
+                                            <div class="m-2 mt-4" v-if="report.text">
                                                 <codemirror style="height: auto;" ref="cmEditor" v-model="report.text" :options="{tabSize: 2, theme: 'monokai', lineNumbers: true, line: true, lint: true, lineWrapping: true, fixedGutter: true, readOnly: true}" v-if="report.text.length < 10000" />
                                                 <h4 v-else><i class="fas fa-exclamation-triangle"></i> Page HTML too large to display inline, please use one of the options below.</h4>
                                                 <base-button simple type="primary" class="mt-3 ml-1 mr-1" v-on:click="view_html_in_new_tab(report.text)">
@@ -191,6 +191,9 @@
                                                 <base-button simple type="primary" class="mt-3 ml-1 mr-1" v-on:click="download_html(report.text)">
                                                     <i class="fas fa-download"></i> Download Raw HTML
                                                 </base-button>
+                                            </div>
+                                            <div class="m-2 mt-4" v-else>
+                                                <pre><code>None</code></pre>
                                             </div>
                                             <hr />
                                         </div>
