@@ -8,14 +8,9 @@
                             <h1><i class="fas fa-fire"></i> XSS Payload Fire Reports ({{format_with_commas(report_count)}} total)</h1>
                             <hr />
                             <div v-if="report_count === 0" style="color: white;">No reports!</div>
-                            <div v-else v-for="report in payload_fire_reports">
+                            <div v-else v-for="report in payload_fire_reports" :key="report.id">
                                 <card class="mb-0">
                                     <div v-if="!report.encrypted">
-                                        <div class="screenshot-image-container mb-2">
-                                            <a v-bind:href="base_api_path + '/screenshots/' + report.screenshot_id + '.png'" target="_blank">
-                                                <img slot="image" class="card-img-top report-image" v-bind:src="base_api_path + '/screenshots/' + report.screenshot_id + '.png'" alt="XSS Screenshot" />
-                                            </a>
-                                        </div>
                                         <h4 v-if="report.origin.startsWith('http')" class="card-title">
                                             <code>{{report.url}}</code>
                                         </h4>
@@ -25,9 +20,6 @@
                                         <p class="card-text text-right">
                                             <i style="color: #5bb381;">Fired {{report.createdAt | moment("from", "now") }}</i>
                                         </p>
-                                    </div>
-                                    <div v-else>
-                                        <a class="m-0 w-100 btn-fill" v-bind:href="base_api_path + '/screenshots/' + report.screenshot_id + '.b64png.enc'" target="_blank" class="fas fa-angle-double-down">Download encrypted screenshot</a> 
                                     </div>
                                     <div class="mt-3 button-full">
                                         <base-button class="m-0 btn-fill" simple type="primary" v-on:click="expand_report(report.id)" v-if="!is_report_id_expanded(report.id)">
@@ -45,6 +37,7 @@
                                 <card v-if="is_report_id_expanded(report.id)">
                                     <div v-if="report.encrypted">
                                         <div>
+                                            <a class="m-0 w-100 btn-fill fas fa-angle-double-down" v-bind:href="base_api_path + '/screenshots/' + report.screenshot_id + '.b64png.enc'" target="_blank">Download encrypted screenshot</a>
                                             <div>
                                                 <p class="report-section-label mr-2">EncryptedPayload</p>
                                                 <small slot="helperText" class="form-text text-muted report-section-description">
@@ -69,8 +62,13 @@
                                             <hr />
                                         </div>
                                     </div>
-                                    <div v-else>
+                                    <div v-if="!report.encrypted">
                                         <div>
+                                            <div class="screenshot-image-container mb-2">
+                                                <a v-bind:href="base_api_path + '/screenshots/' + report.screenshot_id + '.png'" target="_blank">
+                                                    <img slot="image" class="card-img-top report-image" v-bind:src="base_api_path + '/screenshots/' + report.screenshot_id + '.png'" alt="XSS Screenshot" />
+                                                </a>
+                                            </div>
                                             <div>
                                                 <p class="report-section-label mr-2">URL</p>
                                                 <small slot="helperText" class="form-text text-muted report-section-description">
@@ -156,11 +154,11 @@
                                                 </small>
                                             </div>
                                             <div class="m-2 mt-4" v-if="report.localstorage">
-                                                <pre v-for="(key, value) in report.localstorage">Key: {{ value }}
+                                                <pre v-for="(key, value) in report.localstorage" :key="key">Key: {{ value }} 
     Value: {{ key }}</pre>
                                             </div>
-                                            <div>
-                                                <pre v-else>No Local Storage content detected</pre>
+                                            <div v-else>
+                                                <pre >No Local Storage content detected</pre>
                                             </div>
                                             <hr />
                                         </div>
@@ -174,6 +172,25 @@
                                             <div class="m-2 mt-4">
                                                 <pre v-if="report.title">{{report.title}}</pre>
                                                 <pre v-else><i>None</i></pre>
+                                            </div>
+                                            <hr />
+                                        </div>
+                                        <div>
+                                            <div>
+                                                <p class="report-section-label mr-2">DOM/HTML</p>
+                                                <small slot="helperText" class="form-text text-muted report-section-description">
+                                                    Rendered DOM of the vulnerable page.
+                                                </small>
+                                            </div>
+                                            <div class="m-2 mt-4">
+                                                <codemirror style="height: auto;" ref="cmEditor" v-model="report.text" :options="{tabSize: 2, theme: 'monokai', lineNumbers: true, line: true, lint: true, lineWrapping: true, fixedGutter: true, readOnly: true}" v-if="report.text.length < 10000" />
+                                                <h4 v-else><i class="fas fa-exclamation-triangle"></i> Page HTML too large to display inline, please use one of the options below.</h4>
+                                                <base-button simple type="primary" class="mt-3 ml-1 mr-1" v-on:click="view_html_in_new_tab(report.text)">
+                                                    <i class="fas fa-external-link-alt"></i> View Raw HTML in New Tab
+                                                </base-button>
+                                                <base-button simple type="primary" class="mt-3 ml-1 mr-1" v-on:click="download_html(report.text)">
+                                                    <i class="fas fa-download"></i> Download Raw HTML
+                                                </base-button>
                                             </div>
                                             <hr />
                                         </div>
@@ -201,8 +218,8 @@
                                                 <pre v-for="secret in report.secrets">Secret type: {{ secret.secret_type }}
     Secret value: {{ secret.secret_value }}</pre>
                                             </div>
-                                            <div>
-                                                <pre v-else>No secrets detected</pre>
+                                            <div v-else>
+                                                <pre >No secrets detected</pre>
                                             </div>
                                             <hr />
                                         </div>
@@ -807,6 +824,7 @@ a.badge-dark:focus {
     background-size: 100%;
     -webkit-background-clip: text;
     -moz-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     -moz-text-fill-color: transparent;
 }
@@ -873,5 +891,4 @@ hr {
     background-color: #ae8c57;
 }
 
-.corner-loader {}
 </style>

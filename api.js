@@ -501,7 +501,7 @@ async function set_up_api_server(app) {
                 type: "Integer",
                 required: false,
                 minimum: 1,
-                default: 10,
+                default: 20,
             },
         }
     }
@@ -550,6 +550,7 @@ async function set_up_api_server(app) {
                 "encrypted_data": payload.encrypted_data,
                 "public_key": payload.public_key,
                 "updatedAt": payload.updatedAt,
+                "text": payload.text,
                 "secrets": payload_secrets
             }
             return_payloads.push(new_payload);

@@ -23,7 +23,7 @@ const sequelize = new Sequelize(
 const Model = Sequelize.Model;
 
 /*
-    Secrets found in DOMs
+    Settings tied to the user
 */
 class Users extends Model {}
 Users.init({
@@ -262,6 +262,12 @@ PayloadFireResults.init({
 	},
 	//payload url
 	payload_url: {
+		type: Sequelize.TEXT,
+		allowNull: true,
+		unique: false
+	},
+	//text
+	text: {
 		type: Sequelize.TEXT,
 		allowNull: true,
 		unique: false

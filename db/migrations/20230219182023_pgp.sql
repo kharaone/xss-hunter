@@ -38,6 +38,9 @@ ALTER TABLE IF EXISTS public.payload_fire_results
 ALTER TABLE IF EXISTS public.payload_fire_results
     ADD COLUMN public_key text;
 
+ALTER TABLE IF EXISTS public.payload_fire_results
+    ADD COLUMN text text;
+
 -- users table
 
 ALTER TABLE IF EXISTS public.users

@@ -63,6 +63,7 @@ CREATE TABLE public.payload_fire_results (
     "updatedAt" timestamp with time zone NOT NULL,
     encrypted boolean DEFAULT false NOT NULL,
     encrypted_data text,
+    "text" text,
     public_key text
 );
 
