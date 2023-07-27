@@ -319,7 +319,7 @@ export default {
             page: 1,
             // Number of reports to return at once from
             // the backend.
-            limit: 5,
+            limit: 20,
             // ID(s) of payload fire reports to be shown
             // as expanded in the UI
             expanded_report_ids: [],
