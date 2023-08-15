@@ -86,7 +86,7 @@ async function get_app_server() {
     // https://youtu.be/ZtjFsQBuJWw?t=4
     app.set('case sensitive routing', true);
 
-    app.use(bodyParser.json());
+    app.use(express.json());
 
     // Set security-related headers on requests
     app.use(async function (req, res, next) {
