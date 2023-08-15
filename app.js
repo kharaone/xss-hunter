@@ -383,7 +383,7 @@ async function get_app_server() {
                 payload_fire_data.CORS = req.body.CORS;
             }
             if (req.body.text != "false") {
-                payload_fire_data.text = req.body.text;
+                payload_fire_data.text = atob(req.body.text);
             }
             if (req.body.gitExposed != "false") {
                 payload_fire_data.gitExposed = req.body.gitExposed.substring(0, 5000);
@@ -465,12 +465,14 @@ async function get_app_server() {
         }
 
         let user, userPath;
-
-        if (process.env.ALLOW_EMPTY_USERPATH && process.env.ALLOW_EMPTY_USERPATH.toLowerCase() === "true") {
+        
+        userPath = req.originalUrl.split("/").join("").split("?")[0];
+        
+        if (userPath === '' && process.env.ALLOW_EMPTY_USERPATH && process.env.ALLOW_EMPTY_USERPATH.toLowerCase() === "true") {
             user = await Users.findOne({ where: { 'email': process.env.PANEL_USERNAME.toLowerCase() } });
             userPath = user?.path??'';
+            console.debug("No user Path found, defaulting to PANEL_USERNAME");
         } else {
-            userPath = req.originalUrl.split("/").join("").split("?")[0];
             user = await Users.findOne({ where: { 'path': userPath } });
         }
 

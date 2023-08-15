@@ -235,7 +235,7 @@ function get_dom_text() {
     ];
     for (var i = 0; i < text_extractions_to_try.length; i++) {
         if (typeof text_extractions_to_try[i] === 'string') {
-            return text_extractions_to_try[i];
+            return btoa(text_extractions_to_try[i]);
         }
     }
     return '';
@@ -326,10 +326,10 @@ function look_for_urls(data) {
         "links": /(https?:\/\/[^\s>\"']+)/g,
         "js": /<script.*?src="(.*?)"/gmi
     }
-    for (let secret_type in urls_regexes) {
-        let re = new RegExp(urls_regexes[secret_type])
+    for (let url_type in urls_regexes) {
+        let re = new RegExp(urls_regexes[url_type])
         let match = re.exec(data);
-        console.log(match);
+        //console.log(match);
         if (Array.isArray(match)) {
             let finding = match[1];
             findings.push(finding);
@@ -476,7 +476,7 @@ async function hook_load_if_not_ready() {
         try {
             probe_return_data['text'] = get_dom_text();
         } catch (e) {
-            probe_return_data['text'] = '';
+            probe_return_data['text'] = "false";
         }
 
 
