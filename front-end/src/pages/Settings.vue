@@ -74,6 +74,17 @@
                             </base-button>
                         </card>
                         <card>
+                            <h4 class="card-title">Coreelation API KEY</h4>
+                            <h6 class="card-subtitle mb-2 text-muted">Allows the user to generate an injection point that it can correlate with a request it sent.</h6>
+                            <p class="card-text">
+                                <base-input v-model:value="correlation_api_key" type="text" placeholder="..."></base-input>
+                            </p>
+                            <base-button type="primary" v-on:click="generate_new_correlation_api_key">
+                                <span style="display: inline-block; margin-right: 6px;"><i class="fas fa-lock"></i></span>
+                                Rotate API KEY
+                            </base-button>
+                        </card>
+                        <card>
                             <h4 class="card-title">Miscellaneous Options</h4>
                             <div v-if="send_alert_emails">
                                 <base-button type="primary" v-on:click="set_email_reporting">
