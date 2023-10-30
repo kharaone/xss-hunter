@@ -385,6 +385,11 @@ InjectionRequests.init({
 		type: Sequelize.TEXT,
 		allowNull: false,
 	},
+	user_id: {
+		type: Sequelize.TEXT,
+		allowNull: false,
+		unique: false
+	},
 }, {
 	sequelize,
 	modelName: 'injection_requests',
@@ -393,7 +398,12 @@ InjectionRequests.init({
 			unique: true,
 			fields: ['injection_key'],
 			method: 'BTREE',
-		}
+		},
+		{
+			unique: false,
+			fields: ['user_id'],
+			method: 'BTREE',
+		},
 	]
 });
 

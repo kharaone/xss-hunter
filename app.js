@@ -474,6 +474,13 @@ async function get_app_server() {
             console.debug("No user Path found, defaulting to PANEL_USERNAME");
         } else {
             user = await Users.findOne({ where: { 'path': userPath } });
+
+            if (user === null) {
+                console.debug("No corresponding user to this userpath found, trying to see if it's a probe_id that has been provided");
+                
+                let injectionRequest = await InjectionRequests.findOne({ where: { 'injection_key': req.params.probe_id } });
+                user = await Users.findOne({ where: { 'id': injectionRequest?.user_id??'' } });
+            }
         }
 
         if (user === null) {
