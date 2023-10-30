@@ -74,7 +74,7 @@
                             </base-button>
                         </card>
                         <card>
-                            <h4 class="card-title">Coreelation API KEY</h4>
+                            <h4 class="card-title">Correlation API KEY</h4>
                             <h6 class="card-subtitle mb-2 text-muted">Allows the user to generate an injection point that it can correlate with a request it sent.</h6>
                             <p class="card-text">
                                 <base-input v-model:value="correlation_api_key" type="text" placeholder="..."></base-input>
