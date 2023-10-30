@@ -681,6 +681,7 @@ async function set_up_api_server(app) {
 				id: uuid.v4(),
 				request: req.body.request,
 				injection_key: req.body.injection_key,
+                user_id: user.id
 			});
         } catch (e) {
         	if(e.name === 'SequelizeUniqueConstraintError') {
