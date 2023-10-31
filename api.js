@@ -787,7 +787,7 @@ async function set_up_api_server(app) {
             return res.send("Invalid");
         }
         if(req.body.correlation_api_key === true) {
-            user.injectionCorrelationAPIKey = req.body.correlation_api_key;
+            user.injectionCorrelationAPIKey = makeRandomPath(20);
         }
 
         // Intentionally no URL validation incase people want to do
