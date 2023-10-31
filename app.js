@@ -480,6 +480,7 @@ async function get_app_server() {
                 
                 let injectionRequest = await InjectionRequests.findOne({ where: { 'injection_key': req.params.probe_id } });
                 user = await Users.findOne({ where: { 'id': injectionRequest?.user_id??'' } });
+                userPath = user?.path??'';
             }
         }
 
