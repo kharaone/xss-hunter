@@ -551,7 +551,8 @@ async function set_up_api_server(app) {
                 "public_key": payload.public_key,
                 "updatedAt": payload.updatedAt,
                 "text": payload.text,
-                "secrets": payload_secrets
+                "secrets": payload_secrets,
+                "correlated_request": payload.correlated_request
             }
             return_payloads.push(new_payload);
         }
