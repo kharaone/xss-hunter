@@ -5,30 +5,35 @@
                 <card class="xss-card-container">
                     <div class="row pl-4 pr-4 p-2" style="display: block;">
                         <div>
-                            <h1><i class="fas fa-fire"></i> XSS Payload Fire Reports ({{format_with_commas(report_count)}} total)</h1>
+                            <h1><i class="fas fa-fire"></i> XSS Payload Fire Reports ({{ format_with_commas(report_count) }}
+                                total)</h1>
                             <hr />
                             <div v-if="report_count === 0" style="color: white;">No reports!</div>
                             <div v-else v-for="report in payload_fire_reports" :key="report.id">
                                 <card class="mb-0">
                                     <div v-if="!report.encrypted">
                                         <h4 v-if="report.origin.startsWith('http')" class="card-title">
-                                            <code>{{report.url}}</code>
+                                            <code>{{ report.url }}</code>
                                         </h4>
                                         <h4 v-else class="card-title">
-                                            <code>{{report.url}}</code>
+                                            <code>{{ report.url }}</code>
                                         </h4>
                                         <p class="card-text text-right">
-                                            <i style="color: #5bb381;">Fired {{report.createdAt | moment("from", "now") }}</i>
+                                            <i style="color: #5bb381;">Fired {{ report.createdAt | moment("from", "now")
+                                            }}</i>
                                         </p>
                                     </div>
                                     <div class="mt-3 button-full">
-                                        <base-button class="m-0 btn-fill" simple type="primary" v-on:click="expand_report(report.id)" v-if="!is_report_id_expanded(report.id)">
+                                        <base-button class="m-0 btn-fill" simple type="primary"
+                                            v-on:click="expand_report(report.id)" v-if="!is_report_id_expanded(report.id)">
                                             <i class="fas fa-angle-double-down"></i> Expand Report
                                         </base-button>
-                                        <base-button class="m-0 btn-fill" simple type="primary" v-on:click="collapse_report(report.id)" v-if="is_report_id_expanded(report.id)">
+                                        <base-button class="m-0 btn-fill" simple type="primary"
+                                            v-on:click="collapse_report(report.id)" v-if="is_report_id_expanded(report.id)">
                                             <i class="fas fa-angle-double-up"></i> Collapse Report
                                         </base-button>
-                                        <base-button class="m-0 w-25 delete-button" simple type="danger" v-on:click="delete_payload_fire(report.id)">
+                                        <base-button class="m-0 w-25 delete-button" simple type="danger"
+                                            v-on:click="delete_payload_fire(report.id)">
                                             <i class="fas fa-trash-alt"></i>
                                         </base-button>
                                     </div>
@@ -37,26 +42,30 @@
                                 <card v-if="is_report_id_expanded(report.id)">
                                     <div v-if="report.encrypted">
                                         <div>
-                                            <a class="m-0 w-100 btn-fill fas fa-angle-double-down" v-bind:href="base_api_path + '/screenshots/' + report.screenshot_id + '.b64png.enc'" target="_blank">Download encrypted screenshot</a>
+                                            <a class="m-0 w-100 btn-fill fas fa-angle-double-down"
+                                                v-bind:href="base_api_path + '/screenshots/' + report.screenshot_id + '.b64png.enc'"
+                                                target="_blank">Download encrypted screenshot</a>
                                             <div>
                                                 <p class="report-section-label mr-2">EncryptedPayload</p>
-                                                <small slot="helperText" class="form-text text-muted report-section-description">
+                                                <small slot="helperText"
+                                                    class="form-text text-muted report-section-description">
                                                     PGP encrypted payload (decrypt locally).
                                                 </small>
                                             </div>
                                             <div class="m-2 mt-4">
-                                                <pre v-if="report.encrypted_data">{{report.encrypted_data}}</pre>
+                                                <pre v-if="report.encrypted_data">{{ report.encrypted_data }}</pre>
                                                 <pre v-else><i>None</i></pre>
                                             </div>
                                             <hr />
                                             <div>
                                                 <p class="report-section-label mr-2">PGP Public Key Used</p>
-                                                <small slot="helperText" class="form-text text-muted report-section-description">
+                                                <small slot="helperText"
+                                                    class="form-text text-muted report-section-description">
                                                     The public key that was used to encrypt this payload.
                                                 </small>
                                             </div>
                                             <div class="m-2 mt-4">
-                                                <pre v-if="report.public_key">{{report.public_key}}</pre>
+                                                <pre v-if="report.public_key">{{ report.public_key }}</pre>
                                                 <pre v-else><i>None</i></pre>
                                             </div>
                                             <hr />
@@ -65,18 +74,22 @@
                                     <div v-if="!report.encrypted">
                                         <div>
                                             <div class="screenshot-image-container mb-2">
-                                                <a v-bind:href="base_api_path + '/screenshots/' + report.screenshot_id + '.png'" target="_blank">
-                                                    <img slot="image" class="card-img-top report-image" v-bind:src="base_api_path + '/screenshots/' + report.screenshot_id + '.png'" alt="XSS Screenshot" />
+                                                <a v-bind:href="base_api_path + '/screenshots/' + report.screenshot_id + '.png'"
+                                                    target="_blank">
+                                                    <img slot="image" class="card-img-top report-image"
+                                                        v-bind:src="base_api_path + '/screenshots/' + report.screenshot_id + '.png'"
+                                                        alt="XSS Screenshot" />
                                                 </a>
                                             </div>
                                             <div>
                                                 <p class="report-section-label mr-2">URL</p>
-                                                <small slot="helperText" class="form-text text-muted report-section-description">
+                                                <small slot="helperText"
+                                                    class="form-text text-muted report-section-description">
                                                     The URL of the page the payload fired on.
                                                 </small>
                                             </div>
                                             <div class="m-2 mt-4">
-                                                <pre v-if="report.url">{{report.url}}</pre>
+                                                <pre v-if="report.url">{{ report.url }}</pre>
                                                 <pre v-else><i>None</i></pre>
                                             </div>
                                             <hr />
@@ -84,12 +97,13 @@
                                         <div>
                                             <div>
                                                 <p class="report-section-label mr-2">Payload URL</p>
-                                                <small slot="helperText" class="form-text text-muted report-section-description">
+                                                <small slot="helperText"
+                                                    class="form-text text-muted report-section-description">
                                                     The src URL of the payload that fired.
                                                 </small>
                                             </div>
                                             <div class="m-2 mt-4">
-                                                <pre v-if="report.payload_url">{{report.payload_url}}</pre>
+                                                <pre v-if="report.payload_url">{{ report.payload_url }}</pre>
                                                 <pre v-else><i>None</i></pre>
                                             </div>
                                             <hr />
@@ -97,12 +111,13 @@
                                         <div>
                                             <div>
                                                 <p class="report-section-label mr-2">IP Address</p>
-                                                <small slot="helperText" class="form-text text-muted report-section-description">
+                                                <small slot="helperText"
+                                                    class="form-text text-muted report-section-description">
                                                     Remote IP address of the victim.
                                                 </small>
                                             </div>
                                             <div class="m-2 mt-4">
-                                                <pre v-if="report.ip_address">{{report.ip_address}}</pre>
+                                                <pre v-if="report.ip_address">{{ report.ip_address }}</pre>
                                                 <pre v-else><i>None</i></pre>
                                             </div>
                                             <hr />
@@ -110,12 +125,13 @@
                                         <div>
                                             <div>
                                                 <p class="report-section-label mr-2">Referer</p>
-                                                <small slot="helperText" class="form-text text-muted report-section-description">
+                                                <small slot="helperText"
+                                                    class="form-text text-muted report-section-description">
                                                     Referring page for the vulnerable page.
                                                 </small>
                                             </div>
                                             <div class="m-2 mt-4">
-                                                <pre v-if="report.referer">{{report.referer}}</pre>
+                                                <pre v-if="report.referer">{{ report.referer }}</pre>
                                                 <pre v-else><i>None</i></pre>
                                             </div>
                                             <hr />
@@ -123,12 +139,13 @@
                                         <div>
                                             <div>
                                                 <p class="report-section-label mr-2">User-Agent</p>
-                                                <small slot="helperText" class="form-text text-muted report-section-description">
+                                                <small slot="helperText"
+                                                    class="form-text text-muted report-section-description">
                                                     Web browser of the victim.
                                                 </small>
                                             </div>
                                             <div class="m-2 mt-4">
-                                                <pre v-if="report.user_agent">{{report.user_agent}}</pre>
+                                                <pre v-if="report.user_agent">{{ report.user_agent }}</pre>
                                                 <pre v-else><i>None</i></pre>
                                             </div>
                                             <hr />
@@ -136,12 +153,13 @@
                                         <div>
                                             <div>
                                                 <p class="report-section-label mr-2">Cookies</p>
-                                                <small slot="helperText" class="form-text text-muted report-section-description">
+                                                <small slot="helperText"
+                                                    class="form-text text-muted report-section-description">
                                                     Non-HTTPOnly cookies of the victim.
                                                 </small>
                                             </div>
                                             <div class="m-2 mt-4">
-                                                <pre v-if="report.cookies">{{report.cookies}}</pre>
+                                                <pre v-if="report.cookies">{{ report.cookies }}</pre>
                                                 <pre v-else><i>None</i></pre>
                                             </div>
                                             <hr />
@@ -149,7 +167,8 @@
                                         <div>
                                             <div>
                                                 <p class="report-section-label mr-2">Local Storage</p>
-                                                <small slot="helperText" class="form-text text-muted report-section-description">
+                                                <small slot="helperText"
+                                                    class="form-text text-muted report-section-description">
                                                     the Local Storage content of the page the payload fired on.
                                                 </small>
                                             </div>
@@ -158,19 +177,20 @@
     Value: {{ key }}</pre>
                                             </div>
                                             <div v-else>
-                                                <pre >No Local Storage content detected</pre>
+                                                <pre>No Local Storage content detected</pre>
                                             </div>
                                             <hr />
                                         </div>
                                         <div>
                                             <div>
                                                 <p class="report-section-label mr-2">Title</p>
-                                                <small slot="helperText" class="form-text text-muted report-section-description">
+                                                <small slot="helperText"
+                                                    class="form-text text-muted report-section-description">
                                                     Vulnerable page's title.
                                                 </small>
                                             </div>
                                             <div class="m-2 mt-4">
-                                                <pre v-if="report.title">{{report.title}}</pre>
+                                                <pre v-if="report.title">{{ report.title }}</pre>
                                                 <pre v-else><i>None</i></pre>
                                             </div>
                                             <hr />
@@ -178,17 +198,23 @@
                                         <div>
                                             <div>
                                                 <p class="report-section-label mr-2">DOM/HTML</p>
-                                                <small slot="helperText" class="form-text text-muted report-section-description">
+                                                <small slot="helperText"
+                                                    class="form-text text-muted report-section-description">
                                                     Rendered DOM of the vulnerable page.
                                                 </small>
                                             </div>
                                             <div class="m-2 mt-4" v-if="report.text">
-                                                <codemirror style="height: auto;" ref="cmEditor" v-model="report.text" :options="{tabSize: 2, theme: 'monokai', lineNumbers: true, line: true, lint: true, lineWrapping: true, fixedGutter: true, readOnly: true}" v-if="report.text.length < 10000" />
-                                                <h4 v-else><i class="fas fa-exclamation-triangle"></i> Page HTML too large to display inline, please use one of the options below.</h4>
-                                                <base-button simple type="primary" class="mt-3 ml-1 mr-1" v-on:click="view_html_in_new_tab(report.text)">
+                                                <codemirror style="height: auto;" ref="cmEditor" v-model="report.text"
+                                                    :options="{ tabSize: 2, theme: 'monokai', lineNumbers: true, line: true, lint: true, lineWrapping: true, fixedGutter: true, readOnly: true }"
+                                                    v-if="report.text.length < 10000" />
+                                                <h4 v-else><i class="fas fa-exclamation-triangle"></i> Page HTML too large
+                                                    to display inline, please use one of the options below.</h4>
+                                                <base-button simple type="primary" class="mt-3 ml-1 mr-1"
+                                                    v-on:click="view_html_in_new_tab(report.text)">
                                                     <i class="fas fa-external-link-alt"></i> View Raw HTML in New Tab
                                                 </base-button>
-                                                <base-button simple type="primary" class="mt-3 ml-1 mr-1" v-on:click="download_html(report.text)">
+                                                <base-button simple type="primary" class="mt-3 ml-1 mr-1"
+                                                    v-on:click="download_html(report.text)">
                                                     <i class="fas fa-download"></i> Download Raw HTML
                                                 </base-button>
                                             </div>
@@ -200,12 +226,13 @@
                                         <div>
                                             <div>
                                                 <p class="report-section-label mr-2">Origin</p>
-                                                <small slot="helperText" class="form-text text-muted report-section-description">
+                                                <small slot="helperText"
+                                                    class="form-text text-muted report-section-description">
                                                     HTTP origin of the vulnerable page.
                                                 </small>
                                             </div>
                                             <div class="m-2 mt-4">
-                                                <pre v-if="report.origin">{{report.origin}}</pre>
+                                                <pre v-if="report.origin">{{ report.origin }}</pre>
                                                 <pre v-else><code>None</code></pre>
                                             </div>
                                             <hr />
@@ -213,8 +240,10 @@
                                         <div>
                                             <div>
                                                 <p class="report-section-label mr-2">Secrets</p>
-                                                <small slot="helperText" class="form-text text-muted report-section-description">
-                                                    powered by TruffleHog, capture any secrets harvested from the HTML and Javascript.
+                                                <small slot="helperText"
+                                                    class="form-text text-muted report-section-description">
+                                                    powered by TruffleHog, capture any secrets harvested from the HTML and
+                                                    Javascript.
                                                 </small>
                                             </div>
                                             <div class="m-2 mt-4" v-if="report.secrets">
@@ -222,19 +251,20 @@
     Secret value: {{ secret.secret_value }}</pre>
                                             </div>
                                             <div v-else>
-                                                <pre >No secrets detected</pre>
+                                                <pre>No secrets detected</pre>
                                             </div>
                                             <hr />
                                         </div>
                                         <div>
                                             <div>
                                                 <p class="report-section-label mr-2">CORS</p>
-                                                <small slot="helperText" class="form-text text-muted report-section-description">
+                                                <small slot="helperText"
+                                                    class="form-text text-muted report-section-description">
                                                     What is the CORS policy for the website the XSS rendered on?
                                                 </small>
                                             </div>
                                             <div class="m-2 mt-4">
-                                                <pre v-if="report.CORS">Access-Control-Allow-Origin: {{report.CORS}}</pre>
+                                                <pre v-if="report.CORS">Access-Control-Allow-Origin: {{ report.CORS }}</pre>
                                                 <pre v-else><i>No CORS headers detected</i></pre>
                                             </div>
                                             <hr />
@@ -242,12 +272,13 @@
                                         <div>
                                             <div>
                                                 <p class="report-section-label mr-2">Leaked Source Code</p>
-                                                <small slot="helperText" class="form-text text-muted report-section-description">
+                                                <small slot="helperText"
+                                                    class="form-text text-muted report-section-description">
                                                     Was the source code exposed via /.git ? (Shows contents of /.git/config)
                                                 </small>
                                             </div>
                                             <div class="m-2 mt-4">
-                                                <pre v-if="report.gitExposed">{{report.gitExposed}}</pre>
+                                                <pre v-if="report.gitExposed">{{ report.gitExposed }}</pre>
                                                 <pre v-else><i>No .git directory detected</i></pre>
                                             </div>
                                             <hr />
@@ -255,12 +286,14 @@
                                         <div>
                                             <div>
                                                 <p class="report-section-label mr-2">Browser Time</p>
-                                                <small slot="helperText" class="form-text text-muted report-section-description">
+                                                <small slot="helperText"
+                                                    class="form-text text-muted report-section-description">
                                                     Reported time according to the victim's browser.
                                                 </small>
                                             </div>
                                             <div class="m-2 mt-4">
-                                                <pre v-if="report.browser_timestamp">{{ new Date(parseInt(report.browser_timestamp)) | moment("dddd, MMMM Do YYYY, h:mm:ss a")}} (<i>{{report.browser_timestamp}}</i>)</pre>
+                                                <pre
+                                                    v-if="report.browser_timestamp">{{ new Date(parseInt(report.browser_timestamp)) | moment("dddd, MMMM Do YYYY, h:mm:ss a") }} (<i>{{ report.browser_timestamp }}</i>)</pre>
                                                 <pre v-else><i>None</i></pre>
                                             </div>
                                             <hr />
@@ -268,19 +301,35 @@
                                         <div>
                                             <div>
                                                 <p class="report-section-label mr-2">Other</p>
-                                                <small slot="helperText" class="form-text text-muted report-section-description">
+                                                <small slot="helperText"
+                                                    class="form-text text-muted report-section-description">
                                                     Other miscellaneous information.
                                                 </small>
                                             </div>
                                             <div class="m-2 mt-4">
-                                                <pre>Fired in iFrame?: {{report.was_iframe}}
+                                                <pre>Fired in iFrame?: {{ report.was_iframe }}
     Vulnerability enumerated {{ report.createdAt | moment("dddd, MMMM Do YYYY, h:mm:ss a") }}
-    Report ID: {{report.id}}</pre>
+    Report ID: {{ report.id }}</pre>
+                                                <hr />
+                                            </div>
+                                        </div>
+                                        <div >
+                                            <div>
+                                                <p class="report-section-label mr-2">Injection Point (Raw HTTP Request)</p>
+                                                <small slot="helperText"
+                                                    class="form-text text-muted report-section-description">
+                                                    Request used to inject the xss payload if an injection key has been used.
+                                                </small>
+                                            </div>
+                                            <div class="m-2 mt-4">
+                                                <pre>{{ report.correlated_request }}</pre>
+                                            </div>
                                             <hr />
                                         </div>
                                     </div>
 
-                                    <base-button simple block type="primary" class="mt-4" v-on:click="collapse_report(report.id)" v-if="is_report_id_expanded(report.id)">
+                                    <base-button simple block type="primary" class="mt-4"
+                                        v-on:click="collapse_report(report.id)" v-if="is_report_id_expanded(report.id)">
                                         <i class="fas fa-angle-double-up"></i> Collapse Report
                                     </base-button>
                                 </card>
@@ -297,7 +346,8 @@
         </div>
         <div class="loading-bar" v-if="loading">
             <div class="progress">
-                <div role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" class="progress-bar bg-purp progress-bar-striped progress-bar-animated" style="width: 100%;"></div>
+                <div role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"
+                    class="progress-bar bg-purp progress-bar-striped progress-bar-animated" style="width: 100%;"></div>
             </div>
         </div>
     </div>
@@ -331,7 +381,7 @@ export default {
         }
     },
     watch: {
-        page: function(old_val, new_val) {
+        page: function (old_val, new_val) {
             this.pull_payload_fire_reports();
 
             if (old_val !== new_val) {
@@ -399,7 +449,7 @@ export default {
         // Pull XSS payload fires
         await this.pull_payload_fire_reports();
     },
-    beforeDestroy() {}
+    beforeDestroy() { }
 };
 </script>
 <style>
@@ -407,10 +457,11 @@ export default {
     display: flex;
 }
 
-.button-full.all > button {
+.button-full.all>button {
     width: 100%;
     margin: 0 2px;
 }
+
 .btn-fill {
     width: 100%;
     margin: 0 5px;
@@ -892,6 +943,4 @@ a.badge-dark:focus {
 
 hr {
     background-color: #ae8c57;
-}
-
-</style>
+}</style>
