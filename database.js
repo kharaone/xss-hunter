@@ -272,6 +272,12 @@ PayloadFireResults.init({
 		allowNull: true,
 		unique: false
 	},
+	//correlated_request
+	correlated_request: {
+		type: Sequelize.TEXT,
+		allowNull: true,
+		unique: false
+	},
 }, {
 	sequelize,
 	modelName: 'payload_fire_results',
