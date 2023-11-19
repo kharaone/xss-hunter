@@ -437,7 +437,7 @@ export default {
             return this.expanded_report_ids.includes(report_id);
         },
         view_html_in_new_tab(input_html) {
-            const new_window = window.open('about:blank', '_blank');
+            const new_window = window.open('', '_blank');
             new_window.document.body.innerText = input_html;
         },
         download_html(input_html) {
