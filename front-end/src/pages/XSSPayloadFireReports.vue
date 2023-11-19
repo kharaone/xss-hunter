@@ -326,6 +326,25 @@
                                             </div>
                                             <hr />
                                         </div>
+                                        <div>
+                                            <div>
+                                                <p class="report-section-label mr-2">Markdown Export</p>
+                                                <small slot="helperText"
+                                                    class="form-text text-muted report-section-description">
+                                                    Markdown format of the a templated report ready to use.
+                                                </small>
+                                            </div>
+                                            <div class="m-2 mt-4" v-if="report">
+                                                <base-button simple type="primary" class="mt-3 ml-1 mr-1"
+                                                    v-on:click="export_markdown(report, null)">
+                                                    <i class="fas fa-download"></i> Open Markdown formatted report
+                                                </base-button>
+                                            </div>
+                                            <div class="m-2 mt-4" v-else>
+                                                <pre><code>None</code></pre>
+                                            </div>
+                                            <hr />
+                                        </div>
                                     </div>
 
                                     <base-button simple block type="primary" class="mt-4"
@@ -426,6 +445,47 @@ export default {
             link.href = `data:text/html,${input_html}`;
             link.download = 'xss-page-contents.html';
             link.click();
+        },
+        export_markdown(injection, markdown) {
+
+            const default_markdown_template = "# Blind XSS Report\r\n\r\n" + 
+            "The page located at `{{url}}` suffers from a Cross-site Scripting (XSS) vulnerability. XSS is a vulnerability which occurs when user input is unsafely encorporated into the HTML markup inside of a webpage." +
+            " When not properly escaped an attacker can inject malicious JavaScript that, once evaluated, can be used to hijack authenticated sessions and rewrite the vulnerable page\'s layout and functionality." +
+            " The following report contains information on an XSS payload that has fired on `{{origin}}`, it can be used to reproduce and remediate the vulnerability.\r\n\r\n" + 
+            "### XSS Payload Fire Details\r\n" + 
+            "##### Vulnerable Page\r\n`{{url}}}`\r\n\r\n" +
+            "##### Victim IP Address\r\n`{{ip_address}}`\r\n\r\n" +
+            "##### Referer\r\n`{{referer}}`\r\n\r\n" +
+            "##### User Agent\r\n`{{user_agent}}`\r\n\r\n" +
+            "##### Cookies (Non-HTTPOnly)\r\n`{{cookies}}`\r\n\r\n" +
+            "##### Document Object Model (DOM)\r\n```html\n{{text}}\n```\r\n\r\n" +
+            "##### Injection Point (Raw HTTP Request)\r\n```http\n{{correlated_request}}\r\n```\n\r\n\r\n" +
+            "##### Origin\r\n`{{origin}}`\r\n\r\n" +
+            "##### HTML5 Canvas-Rendered Screenshot\r\n" + this.base_api_path + '/screenshots/' +"{{screenshot_id}}.png\r\n\r\n" +
+            "##### Injection Timestamp\r\n`{{browser_timestamp}}`\r\n\r\n" +
+            "## Remediation\r\n" +
+            "For more information about Cross-site Scripting and remediation of the issue, see the following resources:\r\n\r\n" +
+            "* [Cross-site Scripting (XSS) - OWASP](https:\/\/www.owasp.org\/index.php\/Cross-site_Scripting_(XSS))\r\n" +
+            "* [XSS (Cross Site Scripting) Prevention Cheat Sheet - OWASP](https:\/\/www.owasp.org\/index.php\/XSS_(Cross_Site_Scripting)_Prevention_Cheat_Sheet)\r\n" +
+            "* [What is Cross-site Scripting and How Can You Fix it?](https:\/\/www.acunetix.com\/websitesecurity\/cross-site-scripting\/)\r\n" +
+            "* [An Introduction to Content Security Policy - HTML5 Rocks](http:\/\/www.html5rocks.com\/en\/tutorials\/security\/content-security-policy\/)\r\n" +
+            "* [Why is the same origin policy so important? - Information Security Stack Exchange](https:\/\/security.stackexchange.com\/questions\/8264\/why-is-the-same-origin-policy-so-important)\r\n\r\n";
+            const markdown_template = markdown || default_markdown_template;
+            let markdown_template_rendered = markdown_template;
+
+            for ( var key in injection ) {
+                if ( injection.hasOwnProperty( key ) ) {
+                    const replacement = new RegExp( "\{\{" + key + "\}\}", "g");
+                    markdown_template_rendered = markdown_template_rendered.replace( replacement, injection[key] );
+                }
+            }
+            console.log(markdown_template_rendered);
+
+            const new_window = window.open('', '_blank');
+            new_window.document.body.innerText = markdown_template_rendered;
+
+            return markdown_template_rendered;
+
         },
         format_with_commas(input_number) {
             return input_number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
