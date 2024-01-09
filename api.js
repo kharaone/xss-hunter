@@ -306,7 +306,7 @@ async function set_up_api_server(app) {
     	'./front-end/dist/',
     	{
     		setHeaders: function (res, path, stat) {
-    			res.set("Content-Security-Policy", "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self'; prefetch-src 'self'; manifest-src 'self'");
+    			res.set("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self'; prefetch-src 'self'; manifest-src 'self'");
     		},
     	},
     ));
