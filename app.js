@@ -43,7 +43,7 @@ async function check_file_exists(file_path) {
 }
 
 function b64_to_utf8( str ) {
-    return decodeURIComponent(escape(window.atob( str )));
+    return decodeURIComponent(escape(atob( str )));
 }
 
 
