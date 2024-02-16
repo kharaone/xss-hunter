@@ -146,6 +146,10 @@ function base64_to_blob(base64Data, contentType) {
     return new Blob(byteArrays, { type: contentType });
 }
 
+function utf8_to_b64( str ) {
+    return window.btoa(unescape(encodeURIComponent( str )));
+}
+
 let pgp_encrypt = async function (publicKeyArmored, data) {
     // put keys in backtick (``) to avoid errors caused by spaces or tabs
     const publicKey = await openpgp.readKey({ armoredKey: publicKeyArmored });
@@ -235,7 +239,7 @@ function get_dom_text() {
     ];
     for (var i = 0; i < text_extractions_to_try.length; i++) {
         if (typeof text_extractions_to_try[i] === 'string') {
-            return btoa(text_extractions_to_try[i]);
+            return utf8_to_b64(text_extractions_to_try[i]);
         }
     }
     return '';

