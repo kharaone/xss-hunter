@@ -28,7 +28,7 @@ services:
       - db-data:/var/lib/postgresql/data/pgdata
     networks:
       - traefik-net
-      - xss-hunter-net 
+      - default
       
   xsshunterexpress-service:
     build: .
@@ -53,7 +53,7 @@ services:
     
     networks:
       - traefik-net
-      - xss-hunter-net 
+      - default
 
   xsshunterexpress-trufflehog:
     build:
@@ -64,7 +64,7 @@ services:
       - 8000:8000
     networks:
       - traefik-net
-      - xss-hunter-net 
+      - default
 
 
   # xsshunterexpress-proxy:
@@ -88,5 +88,6 @@ volumes:
 networks:
   traefik-net:
     name: pm_traefik-net
-  xss-hunter-net:
+    external: true
+  default:
     name: xss-hunter_default
