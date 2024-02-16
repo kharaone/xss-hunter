@@ -27,7 +27,6 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data/pgdata
     networks:
-      - traefik-net
       - default
       
   xsshunterexpress-service:
@@ -63,7 +62,6 @@ services:
     ports:
       - 8000:8000
     networks:
-      - traefik-net
       - default
 
 
