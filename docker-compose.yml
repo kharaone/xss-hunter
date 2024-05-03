@@ -65,19 +65,19 @@ services:
       - default
 
 
-  # xsshunterexpress-proxy:
-  #   image: caddy:alpine
-  #   container_name: xsshunterexpress-proxy
-  #   restart: unless-stopped
-  #   env_file:
-  #     - .env
-  #   ports:
-  #     - 80:80
-  #     - 443:443
-  #   volumes:
-  #     - ./caddy/data:/data
-  #     - ./caddy/config:/config
-  #     - ./Caddyfile:/etc/caddy/Caddyfile
+  xsshunterexpress-proxy:
+    image: caddy:alpine
+    container_name: xsshunterexpress-proxy
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./caddy/data:/data
+      - ./caddy/config:/config
+      - ./Caddyfile:/etc/caddy/Caddyfile
 
 volumes:
   payloads-data:
